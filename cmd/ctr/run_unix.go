@@ -118,12 +118,16 @@ func newContainer(ctx gocontext.Context, client *containerd.Client, context *cli
 
 func newTask(ctx gocontext.Context, container containerd.Container, checkpoint digest.Digest, tty bool) (containerd.Task, error) {
 	if checkpoint == "" {
+		logrus.Warnf("\ncheckpoint is nothing\n")
 		io := containerd.Stdio
 		if tty {
+			logrus.Warnf("\nis tty\n")
 			io = containerd.StdioTerminal
 		}
+		logrus.Warnf("\nreturning here\n")
 		return container.NewTask(ctx, io)
 	}
+	logrus.Warnf("\nreturning here instead, checkpoint must be a thing, it is \n", checkpoint)
 	return container.NewTask(ctx, containerd.Stdio, containerd.WithTaskCheckpoint(v1.Descriptor{
 		Digest: checkpoint,
 	}))
