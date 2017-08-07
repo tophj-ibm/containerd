@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"fmt"
 
 	"github.com/containerd/containerd/errdefs"
 	"github.com/gogo/protobuf/proto"
@@ -92,6 +93,7 @@ func UnmarshalAny(any *types.Any) (interface{}, error) {
 	} else {
 		err = json.Unmarshal(any.Value, v)
 	}
+	fmt.Println("\n\n json unmarshalany err is ", err)
 	return v, err
 }
 

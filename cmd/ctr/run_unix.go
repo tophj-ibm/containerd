@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	gocontext "context"
 	"os"
 	"os/signal"
@@ -117,6 +118,7 @@ func newContainer(ctx gocontext.Context, client *containerd.Client, context *cli
 }
 
 func newTask(ctx gocontext.Context, container containerd.Container, checkpoint digest.Digest, tty bool) (containerd.Task, error) {
+	fmt.Println("\n\n got here \n")
 	if checkpoint == "" {
 		logrus.Warnf("\ncheckpoint is nothing\n")
 		io := containerd.Stdio

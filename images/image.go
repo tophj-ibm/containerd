@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"time"
+	"fmt"
 
 	"github.com/containerd/containerd/content"
 	digest "github.com/opencontainers/go-digest"
@@ -86,6 +87,7 @@ func Config(ctx context.Context, provider content.Provider, image ocispec.Descri
 
 			var manifest ocispec.Manifest
 			if err := json.Unmarshal(p, &manifest); err != nil {
+				fmt.Println("failure in config")
 				return nil, err
 			}
 
@@ -111,6 +113,7 @@ func RootFS(ctx context.Context, provider content.Provider, configDesc ocispec.D
 
 	var config ocispec.Image
 	if err := json.Unmarshal(p, &config); err != nil {
+		fmt.Println("failures in rootfs")
 		return nil, err
 	}
 

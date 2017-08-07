@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"fmt"
 
 	"github.com/opencontainers/go-digest"
 	"github.com/opencontainers/image-spec/specs-go"
@@ -157,6 +158,7 @@ func ReadImageLayout(img string) (spec.ImageLayout, error) {
 	}
 	var layout spec.ImageLayout
 	if err := json.Unmarshal(b, &layout); err != nil {
+		fmt.Println("error in the image spec")
 		return spec.ImageLayout{}, err
 	}
 	return layout, nil

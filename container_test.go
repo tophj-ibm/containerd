@@ -186,6 +186,7 @@ func TestContainerOutput(t *testing.T) {
 	defer container.Delete(ctx, WithRootFSDeletion)
 
 	stdout := bytes.NewBuffer(nil)
+	fmt.Println("\n about to do a new task \n")
 	task, err := container.NewTask(ctx, NewIO(bytes.NewBuffer(nil), stdout, bytes.NewBuffer(nil)))
 	if err != nil {
 		t.Error(err)

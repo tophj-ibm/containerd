@@ -61,9 +61,12 @@ func WithCheckpoint(desc v1.Descriptor, rootfsID string) NewContainerOpts {
 					return err
 				}
 				var any protobuf.Any
+				fmt.Println("here, and data is ", data)
 				if err := proto.Unmarshal(data, &any); err != nil {
+					fmt.Println("\n\n ERROR HERE \n")
 					return err
 				}
+				fmt.Println("after the err, so it must not have failed here")
 				c.Spec = &any
 			}
 		}

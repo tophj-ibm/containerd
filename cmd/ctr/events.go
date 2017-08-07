@@ -35,6 +35,7 @@ var eventsCommand = cli.Command{
 
 			v, err := typeurl.UnmarshalAny(e.Event)
 			if err != nil {
+				fmt.Println("error in unmarhsal in events")
 				return err
 			}
 			out, err := json.Marshal(v)

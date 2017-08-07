@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 	"time"
-
+	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/containerd/containerd/containers"
 	"github.com/containerd/containerd/errdefs"
@@ -228,6 +228,7 @@ func readContainer(container *containers.Container, bkt *bolt.Bucket) error {
 
 			var any types.Any
 			if err := proto.Unmarshal(obkt, &any); err != nil {
+				fmt.Println("\n\n err in proto unmarshal", err)
 				return err
 			}
 			container.Runtime.Options = &any

@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"fmt"
 
 	"github.com/containerd/containerd/api/services/tasks/v1"
 	"github.com/containerd/containerd/api/types"
@@ -102,6 +103,7 @@ func (c *container) SetLabels(ctx context.Context, labels map[string]string) (ma
 func (c *container) Spec() (*specs.Spec, error) {
 	var s specs.Spec
 	if err := json.Unmarshal(c.c.Spec.Value, &s); err != nil {
+		fmt.Println("failure in oce spec in container")
 		return nil, err
 	}
 	return &s, nil
@@ -157,10 +159,12 @@ type NewTaskOpts func(context.Context, *Client, *TaskInfo) error
 func (c *container) NewTask(ctx context.Context, ioCreate IOCreation, opts ...NewTaskOpts) (Task, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	fmt.Println("about to start iocreate")
 	i, err := ioCreate(c.c.ID)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("got past iocreate")
 	request := &tasks.CreateTaskRequest{
 		ContainerID: c.c.ID,
 		Terminal:    i.Terminal,
@@ -168,6 +172,7 @@ func (c *container) NewTask(ctx context.Context, ioCreate IOCreation, opts ...Ne
 		Stdout:      i.Stdout,
 		Stderr:      i.Stderr,
 	}
+	fmt.Println("a bunch of rootfs stuff")
 	if c.c.RootFS != "" {
 		// get the rootfs from the snapshotter and add it to the request
 		mounts, err := c.client.SnapshotService(c.c.Snapshotter).Mounts(ctx, c.c.RootFS)
@@ -182,12 +187,14 @@ func (c *container) NewTask(ctx context.Context, ioCreate IOCreation, opts ...Ne
 			})
 		}
 	}
+	fmt.Println("idk some taskinfo stuff")
 	var info TaskInfo
 	for _, o := range opts {
 		if err := o(ctx, c.client, &info); err != nil {
 			return nil, err
 		}
 	}
+	fmt.Println("some info options")
 	if info.Options != nil {
 		any, err := typeurl.MarshalAny(info.Options)
 		if err != nil {
@@ -200,17 +207,22 @@ func (c *container) NewTask(ctx context.Context, ioCreate IOCreation, opts ...Ne
 		io:     i,
 		id:     c.ID(),
 	}
+	fmt.Println("some checkpoint stuff")
 	if info.Checkpoint != nil {
+		fmt.Println("defer")
 		request.Checkpoint = info.Checkpoint
 		// we need to defer the create call to start
 		t.deferred = request
 	} else {
+		fmt.Println("else, ctx, request", ctx, request)
 		response, err := c.client.TaskService().Create(ctx, request)
+		fmt.Println("past taskservice, response, err is ", response, err)
 		if err != nil {
 			return nil, err
 		}
 		t.pid = response.Pid
 	}
+	fmt.Println("about to return")
 	return t, nil
 }
 

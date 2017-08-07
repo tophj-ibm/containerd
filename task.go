@@ -173,6 +173,7 @@ func (t *task) Wait(ctx context.Context) (uint32, error) {
 		if typeurl.Is(evt.Event, &eventsapi.TaskExit{}) {
 			v, err := typeurl.UnmarshalAny(evt.Event)
 			if err != nil {
+				fmt.Println("\n\nfailure in this wait func?")
 				return UnknownExitStatus, err
 			}
 			e := v.(*eventsapi.TaskExit)
