@@ -209,6 +209,21 @@ PASS
 ok  	github.com/containerd/containerd	4.778s
 ```
 
+## Running in a container
+
+If you want to run containerd in a container, you can build an image with the containerd prerequisites installed by using the dockerfile located in [`contrib`](https://github.com/containerd/containerd/blob/master/contrib/Dockerfile.test).
+
+```sh
+# from the contrib directory, build the image
+docker build -t containerd -f Dockerfile.test ../
+# start the container, if you don't want to run the tests then you don't need to include the mounts
+docker run -it --privileged -v /tmp:/tmp --tmpfs /var/lib/containerd-test containerd  bash
+# containerd isn't installed by default, so build it and install it
+make binaries install
+```
+
+Note: This will build and install containerd from the latest commit in your git branch. To build a specific version or release, make sure you checkout the commit before building.
+
 ## Additional tools
 
 ### containerd-stress
