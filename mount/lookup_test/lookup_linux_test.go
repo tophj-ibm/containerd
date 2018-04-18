@@ -30,6 +30,11 @@ func testLookup(t *testing.T, fsType string) {
 	defer os.RemoveAll(mnt)
 
 	deviceName, cleanupDevice := testutil.NewLoopback(t, 100<<20) // 100 MB
+	defer func() {
+		testutil.Unmount(t, mnt)
+		cleanupDevice()
+
+	}()
 	if out, err := exec.Command("mkfs", "-t", fsType, deviceName).CombinedOutput(); err != nil {
 		// not fatal
 		t.Skipf("could not mkfs (%s) %s: %v (out: %q)", fsType, deviceName, err, string(out))
@@ -38,10 +43,6 @@ func testLookup(t *testing.T, fsType string) {
 		// not fatal
 		t.Skipf("could not mount %s: %v (out: %q)", deviceName, err, string(out))
 	}
-	defer func() {
-		testutil.Unmount(t, mnt)
-		cleanupDevice()
-	}()
 	assert.True(t, strings.HasPrefix(deviceName, "/dev/loop"))
 	info, err := mount.Lookup(mnt)
 	if err != nil {

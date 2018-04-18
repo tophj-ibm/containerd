@@ -21,13 +21,19 @@ func boltSnapshotter(t *testing.T) func(context.Context, string) (snapshot.Snaps
 	return func(ctx context.Context, root string) (snapshot.Snapshotter, func(), error) {
 
 		deviceName, cleanupDevice := testutil.NewLoopback(t, 100<<20) // 100 MB
+		cleanup := func() {
+			testutil.Unmount(t, root)
+			cleanupDevice()
+		}
 
 		if out, err := exec.Command("mkfs.btrfs", deviceName).CombinedOutput(); err != nil {
 			// not fatal
+			cleanup()
 			t.Skipf("could not mkfs.btrfs %s: %v (out: %q)", deviceName, err, string(out))
 		}
 		if out, err := exec.Command("mount", deviceName, root).CombinedOutput(); err != nil {
 			// not fatal
+			cleanup()
 			t.Skipf("could not mount %s: %v (out: %q)", deviceName, err, string(out))
 		}
 
@@ -36,10 +42,7 @@ func boltSnapshotter(t *testing.T) func(context.Context, string) (snapshot.Snaps
 			t.Fatal(err)
 		}
 
-		return snapshotter, func() {
-			testutil.Unmount(t, root)
-			cleanupDevice()
-		}, nil
+		return snapshotter, cleanup, nil
 	}
 }
 

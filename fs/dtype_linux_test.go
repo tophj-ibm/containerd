@@ -21,6 +21,11 @@ func testSupportsDType(t *testing.T, expected bool, mkfs ...string) {
 	defer os.RemoveAll(mnt)
 
 	deviceName, cleanupDevice := testutil.NewLoopback(t, 100<<20) // 100 MB
+	defer func() {
+		testutil.Unmount(t, mnt)
+		cleanupDevice()
+
+	}()
 	if out, err := exec.Command(mkfs[0], append(mkfs[1:], deviceName)...).CombinedOutput(); err != nil {
 		// not fatal
 		t.Skipf("could not mkfs (%v) %s: %v (out: %q)", mkfs, deviceName, err, string(out))
@@ -29,10 +34,6 @@ func testSupportsDType(t *testing.T, expected bool, mkfs ...string) {
 		// not fatal
 		t.Skipf("could not mount %s: %v (out: %q)", deviceName, err, string(out))
 	}
-	defer func() {
-		testutil.Unmount(t, mnt)
-		cleanupDevice()
-	}()
 	// check whether it supports d_type
 	result, err := SupportsDType(mnt)
 	if err != nil {
